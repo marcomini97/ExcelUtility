@@ -10,18 +10,22 @@ namespace ExcelUtilityConsole
                 "1 - Export EER in database" + 
                 "\n\n00 per uscire.\n");
 
-            var stringProva = Console.ReadLine();
+            var inputText = Console.ReadLine();
 
-            while (stringProva != "00") {
+            while (inputText != "00") {
 
-                switch (stringProva)
+                switch (inputText)
                 {
                     case "1":
                         EerExcelService.ReadAndExportEerList();
                         break;
+
+                    default:
+                        Console.WriteLine("Inserimento non valido non valido");
+                        break;
                 }
 
-                stringProva = Console.ReadLine();
+                inputText = Console.ReadLine();
             }
         }
     }

@@ -16,10 +16,10 @@ namespace ExcelUtilityLibrary.Eer
                 Console.WriteLine("\nDocumento non trovato!\n");
                 return;
             }
-            
-            //var listaCodiciEer = _GetEERFromExcel(filePath);
 
-            //_ExportEerList(listaCodiciEer);
+            var listaCodiciEer = _GetEERFromExcel(filePath);
+
+            _ExportEerList(listaCodiciEer);
         }
         
         private static List<Eer> _GetEERFromExcel(string filePath)
@@ -122,9 +122,12 @@ namespace ExcelUtilityLibrary.Eer
             return result;
         }
 
-        private static void _ExportEerList(List<Eer> eerList)
+        private static void _ExportEerList(List<Eer> eerList, bool isDebug = true)
         {
-            const string connectionString = "Data Source=.;Initial Catalog=DbAnc;User Id=saa;Password=Abcd.1234;Encrypt=True;Trust Server Certificate=true";
+            if (!isDebug)
+                return;
+
+            const string connectionString = "Data Source=;Initial Catalog=;User Id=;Password=;Encrypt=True;Trust Server Certificate=true";
             const string query = "INSERT INTO [dbo].[EER]([EerId],[EerCodice],[EerIsPericoloso],[EerDescrizione],[EerD8],[EerD9],[EerD13],[EerD14],[EerD15],[EerR3],[EerR4],[EerR5],[EerR12],[EerR13],[EerIsSos],[EerNota],[EerUteIns],[EerDatIns])VALUES(@Id,@Codice,@Pericoloso,@Descrizione,@D8,@D9,@D13,@D14,@D15,@R3,@R4,@R5,@R12,@R13,@Sospeso,@Nota,@UteIns,@DatIns)";
             
             using (SqlConnection conn = new SqlConnection(connectionString))
