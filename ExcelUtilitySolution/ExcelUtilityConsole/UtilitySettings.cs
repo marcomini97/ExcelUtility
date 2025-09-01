@@ -25,6 +25,7 @@ namespace ExcelUtilityConsole
                         break;
                 }
 
+                Console.Write("Effettua la tua scelta: ");
                 inputText = Console.ReadLine();
             }
         }

@@ -20,6 +20,8 @@ namespace ExcelUtilityLibrary.Eer
             var listaCodiciEer = _GetEERFromExcel(filePath);
 
             _ExportEerList(listaCodiciEer);
+
+            Console.WriteLine("IMPORTAZIONE COMPLETATA\n");
         }
         
         private static List<Eer> _GetEERFromExcel(string filePath)
@@ -55,57 +57,29 @@ namespace ExcelUtilityLibrary.Eer
                                 break;
 
                             case 2:
-                                toAdd.Descrizione = lineValue.ToString().Trim();
+                                stringa = lineValue.ToString();
+
+                                if (string.IsNullOrWhiteSpace(lineValue.ToString()))
+                                    toAdd.Descrizione = "VALORE NON PRESENTE";
+
+                                else
+                                    toAdd.Descrizione = char.ToUpper(stringa[0]) + stringa.Substring(1);
                                 break;
 
                             case 3:
-                                if (lineValue != null)
-                                    toAdd.D8 = true;
+                                if(lineValue != null)
+                                {
+                                    if (lineValue == "A")
+                                        toAdd.Stato = 2;
+                                    else
+                                        toAdd.Stato = 1;
+                                }
+
                                 break;
 
                             case 4:
                                 if (lineValue != null)
-                                    toAdd.D9 = true;
-                                break;
-
-                            case 5:
-                                if (lineValue != null)
-                                    toAdd.D13 = true;
-                                break;
-
-                            case 6:
-                                if (lineValue != null)
-                                    toAdd.D14 = true;
-                                break;
-
-                            case 7:
-                                if (lineValue != null)
-                                    toAdd.D15 = true;
-                                break;
-
-                            case 8:
-                                if (lineValue != null)
-                                    toAdd.R13 = true;
-                                break;
-
-                            case 9:
-                                if (lineValue != null)
-                                    toAdd.R3 = true;
-                                break;
-
-                            case 10:
-                                if (lineValue != null)
-                                    toAdd.R4 = true;
-                                break;
-
-                            case 11:
-                                if (lineValue != null)
-                                    toAdd.R5 = true;
-                                break;
-
-                            case 12:
-                                if (lineValue != null)
-                                    toAdd.R12 = true;
+                                    toAdd.AnalisiPreliminare = true;
                                 break;
                         }
 
@@ -127,8 +101,8 @@ namespace ExcelUtilityLibrary.Eer
             if (!isDebug)
                 return;
 
-            const string connectionString = "Data Source=;Initial Catalog=;User Id=;Password=;Encrypt=True;Trust Server Certificate=true";
-            const string query = "INSERT INTO [dbo].[EER]([EerId],[EerCodice],[EerIsPericoloso],[EerDescrizione],[EerD8],[EerD9],[EerD13],[EerD14],[EerD15],[EerR3],[EerR4],[EerR5],[EerR12],[EerR13],[EerIsSos],[EerNota],[EerUteIns],[EerDatIns])VALUES(@Id,@Codice,@Pericoloso,@Descrizione,@D8,@D9,@D13,@D14,@D15,@R3,@R4,@R5,@R12,@R13,@Sospeso,@Nota,@UteIns,@DatIns)";
+            const string connectionString = "Data Source=NB-MCOMINI;Initial Catalog=DbProduzioneRMB;User Id=sa;Password=Abcd.1234;Encrypt=True;Trust Server Certificate=true";
+            const string query = "INSERT INTO [dbo].[EER]([EerId],[EerCodice],[EerIsPericoloso],[EerDescrizione],[EerStato],[EerAnalisiPreliminare],[EerIsSos],[EerUteIns],[EerDatIns])VALUES(@Id,@Codice,@Pericoloso,@Descrizione,@Stato,@AnalisiPreliminare,@Sospeso,@UteIns,@DatIns)";
             
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -144,18 +118,9 @@ namespace ExcelUtilityLibrary.Eer
                             cmd.Parameters.AddWithValue("@Codice", err.Codice);
                             cmd.Parameters.AddWithValue("@Pericoloso", err.Pericoloso);
                             cmd.Parameters.AddWithValue("@Descrizione", err.Descrizione);
-                            cmd.Parameters.AddWithValue("@D8", err.D8);
-                            cmd.Parameters.AddWithValue("@D9", err.D9);
-                            cmd.Parameters.AddWithValue("@D13", err.D13);
-                            cmd.Parameters.AddWithValue("@D14", err.D14);
-                            cmd.Parameters.AddWithValue("@D15", err.D15);
-                            cmd.Parameters.AddWithValue("@R3", err.R3);
-                            cmd.Parameters.AddWithValue("@R4", err.R4);
-                            cmd.Parameters.AddWithValue("@R5", err.Pericoloso);
-                            cmd.Parameters.AddWithValue("@R12", err.Pericoloso);
-                            cmd.Parameters.AddWithValue("@R13", err.Pericoloso);
+                            cmd.Parameters.AddWithValue("@Stato", err.Stato);
+                            cmd.Parameters.AddWithValue("@AnalisiPreliminare", err.AnalisiPreliminare);
                             cmd.Parameters.AddWithValue("@Sospeso", err.Sospeso);
-                            cmd.Parameters.AddWithValue("@Nota", err.Nota);
                             cmd.Parameters.AddWithValue("@UteIns", err.UteIns);
                             cmd.Parameters.AddWithValue("@DatIns", err.DatIns);
 
