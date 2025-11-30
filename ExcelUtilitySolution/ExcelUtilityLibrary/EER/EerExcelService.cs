@@ -5,9 +5,9 @@ namespace ExcelUtilityLibrary.Eer
 {
     public class EerExcelService
     {
-        public static void ReadAndExportEerList()
+        public static void ReadAndExportEerList(AziendaSettings aziendaSettings)
         {
-            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "File\\CodiciEER.xlsx");
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), $"File\\{aziendaSettings.NomeFile}");
 
             Console.WriteLine("Ricerca del documento in corso...");
 
@@ -17,21 +17,21 @@ namespace ExcelUtilityLibrary.Eer
                 return;
             }
 
-            var listaCodiciEer = _GetEERFromExcel(filePath);
+            var listaCodiciEer = _GetEERFromExcel(filePath, aziendaSettings.NomeFoglio);
 
-            _ExportEerList(listaCodiciEer);
+            _ExportEerList(listaCodiciEer, aziendaSettings.ConnectionString);
 
             Console.WriteLine("IMPORTAZIONE COMPLETATA\n");
         }
-        
-        private static List<Eer> _GetEERFromExcel(string filePath)
+
+        private static List<Eer> _GetEERFromExcel(string filePath, string nomeFoglio)
         {
             var result = new List<Eer>();
 
             FileInfo file = new FileInfo(filePath);
             using (ExcelPackage package = new ExcelPackage(file))
             {
-                var worksheet = package.Workbook.Worksheets["Foglio1"];
+                var worksheet = package.Workbook.Worksheets[nomeFoglio];
                 int colCount = worksheet.Dimension.End.Column;
                 int rowCount = worksheet.Dimension.End.Row;
 
@@ -67,7 +67,7 @@ namespace ExcelUtilityLibrary.Eer
                                 break;
 
                             case 3:
-                                if(lineValue != null)
+                                if (lineValue != null)
                                 {
                                     if (lineValue == "A")
                                         toAdd.Stato = 2;
@@ -80,6 +80,36 @@ namespace ExcelUtilityLibrary.Eer
                             case 4:
                                 if (lineValue != null)
                                     toAdd.AnalisiPreliminare = true;
+                                break;
+
+                            case 5:
+                                if (lineValue != null)
+                                    toAdd.Nota1 = true;
+                                break;
+                            case 6:
+                                if (lineValue != null)
+                                    toAdd.Nota2 = true;
+                                break;
+                            case 7:
+                                if (lineValue != null)
+                                    toAdd.Nota3 = true;
+                                break;
+                            case 8:
+                                if (lineValue != null)
+                                    toAdd.Nota4 = true;
+                                break;
+                            case 9:
+                                if (lineValue != null)
+                                    toAdd.Nota5 = true;
+                                break;
+
+                            case 10:
+                                if (lineValue != null)
+                                    toAdd.Nota6 = true;
+                                break;
+                            case 11:
+                                if (lineValue != null)
+                                    toAdd.Nota7 = true;
                                 break;
                         }
 
@@ -96,14 +126,49 @@ namespace ExcelUtilityLibrary.Eer
             return result;
         }
 
-        private static void _ExportEerList(List<Eer> eerList, bool isDebug = true)
+        private static void _ExportEerList(List<Eer> eerList, string connectionString, bool isDebug = true)
         {
             if (!isDebug)
                 return;
 
-            const string connectionString = "Data Source=NB-MCOMINI;Initial Catalog=DbProduzioneRMB;User Id=sa;Password=Abcd.1234;Encrypt=True;Trust Server Certificate=true";
-            const string query = "INSERT INTO [dbo].[EER]([EerId],[EerCodice],[EerIsPericoloso],[EerDescrizione],[EerStato],[EerAnalisiPreliminare],[EerIsSos],[EerUteIns],[EerDatIns])VALUES(@Id,@Codice,@Pericoloso,@Descrizione,@Stato,@AnalisiPreliminare,@Sospeso,@UteIns,@DatIns)";
-            
+            if (string.IsNullOrWhiteSpace(connectionString))
+                return;
+
+            const string query = @"INSERT INTO [dbo].[EER]
+                                        ([EerId],
+                                         [EerCodice],
+                                         [EerIsPericoloso],
+                                         [EerDescrizione],
+                                         [EerStato],
+                                         [EerAnalisiPreliminare],
+                                         [EerNota1],
+                                         [EerNota2],
+                                         [EerNota3],
+                                         [EerNota4],
+                                         [EerNota5],
+                                         [EerNota6],
+                                         [EerNota7],
+                                         [EerIsSos],
+                                         [EerUteIns],
+                                         [EerDatIns])
+                                        VALUES
+                                         (@Id,
+                                         @Codice,
+                                         @Pericoloso,
+                                         @Descrizione,
+                                         @Stato,
+                                         @AnalisiPreliminare,
+                                         @Nota1,
+                                         @Nota2,
+                                         @Nota3,
+                                         @Nota4,
+                                         @Nota5,
+                                         @Nota6,
+                                         @Nota7,
+                                         @Sospeso,
+                                         @UteIns,
+                                         @DatIns)";
+
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 try
@@ -120,6 +185,13 @@ namespace ExcelUtilityLibrary.Eer
                             cmd.Parameters.AddWithValue("@Descrizione", err.Descrizione);
                             cmd.Parameters.AddWithValue("@Stato", err.Stato);
                             cmd.Parameters.AddWithValue("@AnalisiPreliminare", err.AnalisiPreliminare);
+                            cmd.Parameters.AddWithValue("@Nota1", err.Nota1);
+                            cmd.Parameters.AddWithValue("@Nota2", err.Nota2);
+                            cmd.Parameters.AddWithValue("@Nota3", err.Nota3);
+                            cmd.Parameters.AddWithValue("@Nota4", err.Nota4);
+                            cmd.Parameters.AddWithValue("@Nota5", err.Nota5);
+                            cmd.Parameters.AddWithValue("@Nota6", err.Nota6);
+                            cmd.Parameters.AddWithValue("@Nota7", err.Nota7);
                             cmd.Parameters.AddWithValue("@Sospeso", err.Sospeso);
                             cmd.Parameters.AddWithValue("@UteIns", err.UteIns);
                             cmd.Parameters.AddWithValue("@DatIns", err.DatIns);

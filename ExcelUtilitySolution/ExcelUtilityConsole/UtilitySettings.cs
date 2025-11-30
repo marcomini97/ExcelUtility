@@ -1,10 +1,11 @@
-﻿using ExcelUtilityLibrary.Eer;
+﻿using ExcelUtilityLibrary;
+using ExcelUtilityLibrary.Eer;
 
 namespace ExcelUtilityConsole
 {
     public class UtilitySettings
     {
-        public static void ManageMenuApplication()
+        public static void ManageMenuApplication(AziendaSettings aziendaSettings)
         {
             Console.WriteLine("Scegliere il servizio:\n" +
                 "1 - Export EER in database" + 
@@ -17,7 +18,7 @@ namespace ExcelUtilityConsole
                 switch (inputText)
                 {
                     case "1":
-                        EerExcelService.ReadAndExportEerList();
+                        EerExcelService.ReadAndExportEerList(aziendaSettings);
                         break;
 
                     default:
