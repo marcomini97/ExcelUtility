@@ -22,7 +22,7 @@ namespace ExcelUtilityConsole
                         break;
 
                     default:
-                        Console.WriteLine("Inserimento non valido non valido");
+                        Console.WriteLine("Inserimento non valido");
                         break;
                 }
 

@@ -63,13 +63,16 @@ namespace ExcelUtilityLibrary.Eer
                                     toAdd.Descrizione = "VALORE NON PRESENTE";
 
                                 else
+                                {
+                                    stringa = stringa.Replace("*", "").Trim();
                                     toAdd.Descrizione = char.ToUpper(stringa[0]) + stringa.Substring(1);
+                                }
                                 break;
 
                             case 3:
                                 if (lineValue != null)
                                 {
-                                    if (lineValue == "A")
+                                    if (lineValue.Equals("A"))
                                         toAdd.Stato = 2;
                                     else
                                         toAdd.Stato = 1;
